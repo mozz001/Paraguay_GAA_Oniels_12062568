@@ -5,19 +5,140 @@ from datetime import datetime
 from google.oauth2 import service_account
 import json
 
-# Method 1: Using st.secrets (recommended)
+# Google Sheets Setup
 credentials = service_account.Credentials.from_service_account_info(
-    st.secrets["google_service_account"]
+    st.secrets["google_service_account"],
+    scopes=["https://www.googleapis.com/auth/spreadsheets"]
 )
 
-st.set_page_config(page_title="O'Niels Jersey Order Form", layout="centered")
+service = build('sheets', 'v4', credentials=credentials)
+SHEET_ID = st.secrets["sheet_id"]
 
+st.set_page_config(page_title="O'Niels Jersey Order Form", layout="centered")
 st.title("O'Niels Jersey Order Form - June 2025")
 st.markdown("""
 #### 🇬🇧 English / 🇪🇸 Español
 Please fill in all the fields below. Prices will be calculated in real time.
 Por favor complete todos los campos a continuación. Los precios se calcularán en tiempo real.
 """)
+
+# Google Sheets Functions
+def setup_sheet_headers():
+    """Setup headers in Google Sheet if they don't exist"""
+    try:
+        headers = [
+            "order_id", "name", "whatsapp", "number", "jersey1", "jersey2", 
+            "shorts1", "shorts2", "socks1", "socks2", "polo_adult", "polo_kid", 
+            "total_usd", "confirmation", "timestamp"
+        ]
+        
+        # Check if headers exist
+        result = service.spreadsheets().values().get(
+            spreadsheetId=SHEET_ID,
+            range="Sheet1!A1:O1"
+        ).execute()
+        
+        values = result.get('values', [])
+        
+        # If no headers, add them
+        if not values:
+            service.spreadsheets().values().update(
+                spreadsheetId=SHEET_ID,
+                range="Sheet1!A1:O1",
+                valueInputOption="RAW",
+                body={"values": [headers]}
+            ).execute()
+            return True
+        return False
+    except Exception as e:
+        st.error(f"Error setting up headers: {str(e)}")
+        return False
+
+def write_to_google_sheets(order_data):
+    """Write order data to Google Sheets"""
+    try:
+        # Convert order data to list format
+        row_data = [
+            order_data["order_id"],
+            order_data["name"],
+            order_data["whatsapp"],
+            order_data["number"],
+            order_data["jersey1"],
+            order_data["jersey2"],
+            order_data["shorts1"],
+            order_data["shorts2"],
+            order_data["socks1"],
+            order_data["socks2"],
+            order_data["polo_adult"],
+            order_data["polo_kid"],
+            order_data["total_usd"],
+            order_data["confirmation"],
+            order_data["timestamp"]
+        ]
+        
+        # Append to sheet
+        result = service.spreadsheets().values().append(
+            spreadsheetId=SHEET_ID,
+            range="Sheet1!A:O",
+            valueInputOption="RAW",
+            insertDataOption="INSERT_ROWS",
+            body={"values": [row_data]}
+        ).execute()
+        
+        return True
+    except Exception as e:
+        st.error(f"Error writing to Google Sheets: {str(e)}")
+        return False
+
+def get_next_order_number():
+    """Get next order number from Google Sheets"""
+    try:
+        # Get all order IDs from Google Sheets
+        result = service.spreadsheets().values().get(
+            spreadsheetId=SHEET_ID,
+            range="Sheet1!A:A"
+        ).execute()
+        
+        values = result.get('values', [])
+        
+        if len(values) <= 1:  # Only headers or empty
+            return "001"
+        
+        # Get the last order ID and increment
+        order_ids = [row[0] for row in values[1:] if row]  # Skip header
+        if order_ids:
+            last_id = max([int(id_str) for id_str in order_ids if id_str.isdigit()])
+            return f"{last_id + 1:03d}"
+        else:
+            return "001"
+            
+    except Exception as e:
+        st.error(f"Error getting order number: {str(e)}")
+        return "001"
+
+# Test Google Sheets connection
+def test_connection():
+    """Test Google Sheets connection"""
+    try:
+        result = service.spreadsheets().get(spreadsheetId=SHEET_ID).execute()
+        sheet_title = result.get('properties', {}).get('title', 'Unknown')
+        st.success(f"✅ Connected to Google Sheet: '{sheet_title}'")
+        return True
+    except Exception as e:
+        st.error(f"❌ Connection failed: {str(e)}")
+        return False
+# Sidebar for testing
+with st.sidebar:
+    st.header("🔧 Setup & Testing")
+    
+    if st.button("Test Google Sheets Connection"):
+        test_connection()
+    
+    if st.button("Setup Sheet Headers"):
+        if setup_sheet_headers():
+            st.success("✅ Headers added to sheet!")
+        else:
+            st.info("ℹ️ Headers already exist or connection failed")
 
 # Price mappings
 jersey_prices = {
