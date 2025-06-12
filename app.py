@@ -2,6 +2,14 @@ import streamlit as st
 import pandas as pd
 import os
 from datetime import datetime
+import streamlit as st
+from google.oauth2 import service_account
+import json
+
+# Method 1: Using st.secrets (recommended)
+credentials = service_account.Credentials.from_service_account_info(
+    st.secrets["google_service_account"]
+)
 
 st.set_page_config(page_title="O'Niels Jersey Order Form", layout="centered")
 
