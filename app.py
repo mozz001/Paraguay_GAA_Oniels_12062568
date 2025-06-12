@@ -29,7 +29,7 @@ shorts_prices = {
     "No quiero esto - I don't need it": 0.0
 }
 
-socksCrewSize_prices = {
+socks_prices = {
     "S": 10.00,
     "L": 10.00,
     "M": 10.00,
