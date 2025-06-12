@@ -2,7 +2,6 @@ import streamlit as st
 import pandas as pd
 import os
 from datetime import datetime
-import streamlit as st
 from google.oauth2 import service_account
 import json
 
