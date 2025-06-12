@@ -5,10 +5,107 @@ from datetime import datetime
 from google.oauth2 import service_account
 import json
 
-# Method 1: Using st.secrets (recommended)
 credentials = service_account.Credentials.from_service_account_info(
-    st.secrets["google_service_account"]
+    st.secrets["google_service_account"],
+    scopes=["https://www.googleapis.com/auth/spreadsheets"]
 )
+
+# Also need to build the service:
+from googleapiclient.discovery import build
+service = build('sheets', 'v4', credentials=credentials)
+SHEET_ID = st.secrets["sheet_id"]
+
+def setup_sheet_headers():
+    """Setup headers in Google Sheet if they don't exist"""
+    try:
+        headers = [
+            "order_id", "name", "whatsapp", "number", "jersey1", "jersey2", 
+            "shorts1", "shorts2", "socks1", "socks2", "polo_adult", "polo_kid", 
+            "total_usd", "confirmation", "timestamp"
+        ]
+        
+        # Check if headers exist
+        result = service.spreadsheets().values().get(
+            spreadsheetId=SHEET_ID,
+            range="Sheet1!A1:O1"
+        ).execute()
+        
+        values = result.get('values', [])
+        
+        # If no headers, add them
+        if not values:
+            service.spreadsheets().values().update(
+                spreadsheetId=SHEET_ID,
+                range="Sheet1!A1:O1",
+                valueInputOption="RAW",
+                body={"values": [headers]}
+            ).execute()
+            return True
+        return False
+    except Exception as e:
+        st.error(f"Error setting up headers: {str(e)}")
+        return False
+
+def write_to_google_sheets(order_data):
+    """Write order data to Google Sheets"""
+    try:
+        # Convert order data to list format
+        row_data = [
+            order_data["order_id"],
+            order_data["name"],
+            order_data["whatsapp"],
+            order_data["number"],
+            order_data["jersey1"],
+            order_data["jersey2"],
+            order_data["shorts1"],
+            order_data["shorts2"],
+            order_data["socks1"],
+            order_data["socks2"],
+            order_data["polo_adult"],
+            order_data["polo_kid"],
+            order_data["total_usd"],
+            order_data["confirmation"],
+            order_data["timestamp"]
+        ]
+        
+        # Append to sheet
+        result = service.spreadsheets().values().append(
+            spreadsheetId=SHEET_ID,
+            range="Sheet1!A:O",
+            valueInputOption="RAW",
+            insertDataOption="INSERT_ROWS",
+            body={"values": [row_data]}
+        ).execute()
+        
+        return True
+    except Exception as e:
+        st.error(f"Error writing to Google Sheets: {str(e)}")
+        return False
+# Test Google Sheets connection
+def test_connection():
+    """Test Google Sheets connection"""
+    try:
+        result = service.spreadsheets().get(spreadsheetId=SHEET_ID).execute()
+        sheet_title = result.get('properties', {}).get('title', 'Unknown')
+        st.success(f"✅ Connected to Google Sheet: '{sheet_title}'")
+        return True
+    except Exception as e:
+        st.error(f"❌ Connection failed: {str(e)}")
+        return False
+
+# Sidebar for testing
+with st.sidebar:
+    st.header("🔧 Setup & Testing")
+    
+    if st.button("Test Google Sheets Connection"):
+        test_connection()
+    
+    if st.button("Setup Sheet Headers"):
+        if setup_sheet_headers():
+            st.success("✅ Headers added to sheet!")
+        else:
+            st.info("ℹ️ Headers already exist or connection failed")
+
 
 st.set_page_config(page_title="O'Niels Jersey Order Form", layout="centered")
 
