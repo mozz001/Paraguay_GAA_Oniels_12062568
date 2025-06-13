@@ -11,6 +11,7 @@ from google.api_core.exceptions import GoogleAPIError
 SHEET_ID = "1KSJH2VPZGNZz3gMUdc-RUGqCSgYnwvKF7cYoKLuiZi0"
 SHEET_NAME = "Sheet1"
 
+
 # Define the scope (more restrictive)
 SCOPES = [
     "https://www.googleapis.com/auth/spreadsheets",
@@ -69,59 +70,22 @@ Por favor complete todos los campos a continuación. Los precios se calcularán 
 
 
 # Google Sheets Functions
-def setup_sheet_headers():
-    """Setup headers in Google Sheet if they don't exist"""
+def get_next_order_number():
+    """Get next order number from column A"""
     try:
-        headers = [
-            "order_id", "name", "whatsapp", "number", "jersey1", "jersey2", 
-            "shorts1", "shorts2", "socks1", "socks2", "polo_adult", "polo_kid", 
-            "total_usd", "confirmation", "timestamp"
-        ]
-        
-        # Check if headers exist
-        result = service.spreadsheets().values().get(
-            spreadsheetId=SHEET_ID,
-            range="Sheet1!A1:O1"
-        ).execute()
-        
-        values = result.get('values', [])
-        
-        # If no headers, add them
-        if not values:
-            service.spreadsheets().values().update(
-                spreadsheetId=SHEET_ID,
-                range="Sheet1!A1:O1",
-                valueInputOption="RAW",
-                body={"values": [headers]}
-            ).execute()
-            return True
-        return False
+        order_ids = worksheet.col_values(1)[1:]  # Skip header
+        if not order_ids:
+            return "001"
+        numeric_ids = [int(id) for id in order_ids if id.isdigit()]
+        return f"{max(numeric_ids) + 1:03d}" if numeric_ids else "001"
     except Exception as e:
-        st.error(f"Error setting up headers: {str(e)}")
-        return False
-
-def setup_sheet_headers():
-    """Setup headers using gspread only"""
-    try:
-        headers = ["order_id", "name", "whatsapp", "number", "jersey1", "jersey2", 
-                 "shorts1", "shorts2", "socks1", "socks2", "polo_adult", "polo_kid",
-                 "total_usd", "confirmation", "timestamp"]
-        
-        # Get current headers
-        current_headers = worksheet.row_values(1)
-        
-        if not current_headers:
-            worksheet.insert_row(headers, 1)
-            return True
-        return False
-    except Exception as e:
-        st.error(f"Header setup error: {str(e)}")
-        return False
+        st.error(f"⚠️ Order number error: {str(e)}")
+        return "001"
 
 def write_to_google_sheets(order_data):
-    """Write using gspread only"""
+    """Append order data to worksheet"""
     try:
-        row_data = [
+        worksheet.append_row([
             order_data["order_id"],
             order_data["name"],
             order_data["whatsapp"],
@@ -137,12 +101,26 @@ def write_to_google_sheets(order_data):
             order_data["total_usd"],
             order_data["confirmation"],
             order_data["timestamp"]
-        ]
-        worksheet.append_row(row_data)
+        ])
         return True
     except Exception as e:
-        st.error(f"Write error: {str(e)}")
+        st.error(f"⚠️ Write error: {str(e)}")
         return False
+
+def setup_sheet_headers():
+    """Initialize headers if needed"""
+    try:
+        headers = ["order_id", "name", "whatsapp", "number", "jersey1", "jersey2",
+                  "shorts1", "shorts2", "socks1", "socks2", "polo_adult", "polo_kid",
+                  "total_usd", "confirmation", "timestamp"]
+        if not worksheet.row_values(1):
+            worksheet.insert_row(headers, 1)
+            return True
+        return False
+    except Exception as e:
+        st.error(f"⚠️ Header error: {str(e)}")
+        return False
+
 
 def get_next_order_number():
     """Get next ID using gspread only"""
@@ -288,33 +266,29 @@ st.markdown(f"### 💵 Total: **${total:.2f}** USD")
 # Submission - REPLACE THIS ENTIRE SECTION
 if st.button("Submit Order / Enviar pedido"):
     if not all([name, whatsapp, confirm_name_date]):
-        st.error("❌ Please complete all required fields. / Por favor complete todos los campos obligatorios.")
+        st.error("❌ Please complete all required fields.")
     else:
-        # Get next order ID FROM GOOGLE SHEETS (using your existing function)
         order_id = get_next_order_number()
-        
-        # Prepare order data
         order_data = {
-        "order_id": order_id,
-        "name": name,
-        "whatsapp": whatsapp,
-        "number": number,
-        "jersey1": jersey1,
-        "jersey2": jersey2,
-        "shorts1": shorts1,
-        "shorts2": shorts2,
-        "socks1": socks1,
-        "socks2": socks2,
-        "polo_adult": polo_adult,
-        "polo_kid": polo_kid,
-        "total_usd": total,
-        "confirmation": confirm_name_date,
-        "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            "order_id": order_id,
+            "name": name,
+            "whatsapp": whatsapp,
+            "number": number,
+            "jersey1": jersey1,
+            "jersey2": jersey2,
+            "shorts1": shorts1,
+            "shorts2": shorts2,
+            "socks1": socks1,
+            "socks2": socks2,
+            "polo_adult": polo_adult,
+            "polo_kid": polo_kid,
+            "total_usd": total,
+            "confirmation": confirm_name_date,
+            "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         }
         
-        # WRITE TO GOOGLE SHEETS (using your existing function)
         if write_to_google_sheets(order_data):
-            st.success(f"✅ Order #{order_id} submitted to Google Sheets!")
+            st.success(f"✅ Order #{order_id} saved successfully!")
             st.balloons()
         else:
-            st.error("❌ Failed to save to Google Sheets. Please try again.")
+            st.error("❌ Failed to save. Please try again or contact support.")
