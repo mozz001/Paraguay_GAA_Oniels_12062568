@@ -278,14 +278,6 @@ total = jersey_prices[jersey1] + jersey_prices[jersey2] + \
 
 st.markdown(f"### 💵 Total: **${total:.2f}** USD")
 
-# Save order with unique ID
-def get_next_order_number(csv_file):
-    if not os.path.exists(csv_file):
-        return "001"
-    df = pd.read_csv(csv_file)
-    last_id = df["order_id"].iloc[-1]
-    next_id = int(last_id) + 1
-    return f"{next_id:03d}"
 
 
 # Submission - REPLACE THIS ENTIRE SECTION
