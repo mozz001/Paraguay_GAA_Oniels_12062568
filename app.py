@@ -13,6 +13,10 @@ credentials = service_account.Credentials.from_service_account_info(
     scopes=["https://www.googleapis.com/auth/spreadsheets"]
 )
 
+# Authorize
+creds = ServiceAccountCredentials.from_json_keyfile_dict(creds_dict, scope)
+client = gspread.authorize(creds)
+
 # Access the spreadsheet and sheet
 service = build('sheets', 'v4', credentials=credentials)
 spreadsheet = client.open_by_key("1KSJH2VPZGNZz3gMUdc-RUGqCSgYnwvKF7cYoKLuiZi0")
