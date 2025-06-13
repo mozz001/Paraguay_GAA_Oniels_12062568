@@ -16,7 +16,7 @@ credentials = service_account.Credentials.from_service_account_info(
 # Access the spreadsheet and sheet
 service = build('sheets', 'v4', credentials=credentials)
 spreadsheet = client.open_by_key("1KSJH2VPZGNZz3gMUdc-RUGqCSgYnwvKF7cYoKLuiZi0")
-SHEET_ID = spreadsheet.worksheet("Sheet1")
+sheet_id = spreadsheet.worksheet("Sheet1")
 
 st.set_page_config(page_title="O'Niels Jersey Order Form", layout="centered")
 
