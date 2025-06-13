@@ -9,12 +9,9 @@ from google.api_core.exceptions import GoogleAPIError
 
 # Define the scope (more restrictive)
 SCOPES = [
-    "https://www.googleapis.com/auth/spreadsheets",  # Minimum required scope
-    "https://www.googleapis.com/auth/drive.file"    # Only access created files
+    "https://www.googleapis.com/auth/spreadsheets",
+    "https://www.googleapis.com/auth/drive.file"
 ]
-
-# Replace any problematic secret loading with:
-SHEET_ID = st.secrets["google_sheets"]["sheet_id"]
 
 def get_google_credentials():
     """Secure credential loading with enhanced validation"""
@@ -33,14 +30,15 @@ def get_google_credentials():
 
 # Initialize services
 try:
+    # 1. First get credentials
     creds = get_google_credentials()
     
-    # Initialize clients with error handling
+    # 2. Then initialize clients
     gspread_client = gspread.authorize(creds)
-    service = build('sheets', 'v4', credentials=creds)
+    sheets_service = build('sheets', 'v4', credentials=creds)  # This is your 'service'
     
-    # Access spreadsheet with explicit error handling
-    SPREADSHEET_ID = "1KSJH2VPZGNZz3gMUdc-RUGqCSgYnwvKF7cYoKLuiZi0"
+    # 3. Then access spreadsheet
+    SPREADSHEET_ID = st.secrets.get("google_sheets", {}).get("sheet_id") or "1KSJH2VPZGNZz3gMUdc-RUGqCSgYnwvKF7cYoKLuiZi0"
     spreadsheet = gspread_client.open_by_key(SPREADSHEET_ID)
     worksheet = spreadsheet.worksheet("Sheet1")
     
@@ -50,6 +48,13 @@ except GoogleAPIError as e:
 except Exception as e:
     st.error(f"⚠️ Unexpected error: {str(e)}")
     st.stop()
+
+# Remove this duplicate line - it's causing the error
+# service = build('sheets', 'v4', credentials=credentials)  # ← DELETE THIS LINE
+
+# Now you can use either:
+# - gspread_client (for gspread operations)
+# - sheets_service (for google-api-python-client operations)
 
 st.title("O'Niels Jersey Order Form - June 2025")
 st.markdown("""
