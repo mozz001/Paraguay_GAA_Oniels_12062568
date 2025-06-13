@@ -161,14 +161,32 @@ with st.sidebar:
             st.info("ℹ️ Bro, seriously? Don't click FFS")
 
 # Price mappings
+
 jersey_prices = {
+    # Baby/Kids Sizes
     "0-6M - Age 3/4": 31.00,
     "Age 5/6 - 13/14": 36.00,
-    "Adult XS - 2XL": 38.00,
-    "Adult 3XL - 5XL": 42.00,
-    "Adult 6XL - 7XL": 46.00,
+    
+    # Adult Standard Sizes
+    "Adult XS": 38.00,
+    "Adult S": 38.00,
+    "Adult M": 38.00,
+    "Adult L": 38.00,
+    "Adult XL": 38.00,
+    "Adult 2XL": 38.00,
+    
+    # Adult Plus Sizes
+    "Adult 3XL": 42.00,
+    "Adult 4XL": 42.00,
+    "Adult 5XL": 42.00,
+    "Adult 6XL": 46.00,
+    "Adult 7XL": 46.00,
+    
+    # Women's Specific
     "Women Size 8 - 20": 38.00,
-    "No quiero esta camiseta": 0.0
+    
+    # No option
+    "No quiero esta camiseta - I don't want it": 0.0
 }
 
 shorts_prices = {
