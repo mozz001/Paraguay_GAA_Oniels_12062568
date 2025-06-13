@@ -17,6 +17,184 @@ service = build('sheets', 'v4', credentials=credentials)
 SHEET_ID = st.secrets["sheet_id"]
 
 st.set_page_config(page_title="O'Niels Jersey Order Form", layout="centered")
+
+
+# ✅ FIXED: Move all secrets access inside functions with error handling
+@st.cache_resource
+def init_google_sheets():
+    try:
+        # Define the scope
+        scope = [
+            "https://www.googleapis.com/auth/spreadsheets",
+            "https://www.googleapis.com/auth/drive"
+        ]
+        
+        # ✅ Access secrets inside function with error handling
+        try:
+            credentials_info = st.secrets["google_service_account"]
+            sheet_id = st.secrets["sheet_id"]
+        except KeyError as e:
+            st.error(f"Missing secret key: {e}")
+            st.error("Please check your secrets configuration in Streamlit Cloud settings")
+            # Fallback to hardcoded values for testing
+            st.warning("Using fallback configuration")
+            sheet_id = "1KSJH2VPZGNZz3gMUdc-RUGqCSgYnwvKF7cYoKLuiZi0"
+            credentials_info = {
+                "type": "service_account",
+                "project_id": "paraguay-gaa-oniels-12062568",
+                "private_key_id": "cefdea10a961bac557ece512c650f505c5ed0640",
+                "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQDhGO2ihN1eyHZ/\nD7b9QXgmjEHDtWjOpx9UglOfmV9JPYpCzBEy6FBZct5FV+OA8h8FJHjxNhXGOiEN\n1THm7hBgDanDMgyI1CGfBva6OMnXHnKdRs5+WcZRu+vJJ5LQP0+fYTdOFLgyp4PW\n4cCFXU/ThOZa0rWk3rhi5L6bqJRoqYRR/IVedBny/5VqCeBjnGQtGYTbcecawC9w\nAOySFPArfEoUs9+FF8NIoLmZNi+WvdWZMZBg1dH72hP8VfCZhnXJ5iW0ajIqQnwG\nM39YHPgGOuLvMfqQ6y5sCvdLaHZh7yIIUYhEj4oNPxxGZEAiIKaFAOtnYIq7RYav\nPlTIE6kLAgMBAAECggEAAsrZX9PAH0XjWm4qeffO8sN4qWHdu/qMw/Kd8PPpH7J4\nvZ1kdTo2jPWE1l1hwB7AzcKHEY73NC9Sa6aCaPf5Egf5XCeJykS/agafFu5ParDB\nATx4oU6hzC/FnAg2pQi0Bykgk4JkSpSTaR4B0mW28MvMQ8IraLEunmNyDeJIfQff\nXHb2rc3ct75H368hb/sC+NIXI+O9GiQJ2UJmqbV2Z610rZglBVMFwN+6jGAD8n9W\n5cLP2o4UEd706+UWF44jj1vrMBjpz9wwVKbz0hs6MWHiU/EMyb4ocA2lpO+hXWMB\ng9D6Vgjx4USR7IGm0/2PzMcSFdsgeRGSMWxlLZlCiQKLuiZi0",
+                "client_email": "paraguay-gaa-oniels-12062568@paraguay-gaa-oniels-12062568.iam.gserviceaccount.com",
+                "client_id": "103444277347677347076",
+                "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+                "token_uri": "https://oauth2.googleapis.com/token",
+                "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+                "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/paraguay-gaa-oniels-12062568%40paraguay-gaa-oniels-12062568.iam.gserviceaccount.com",
+                "universe_domain": "googleapis.com"
+            }
+        
+        # Create credentials
+        credentials = Credentials.from_service_account_info(
+            credentials_info, 
+            scopes=scope
+        )
+        
+        # Authorize and create client
+        client = gspread.authorize(credentials)
+        
+        # Open the sheet
+        sheet = client.open_by_key(sheet_id)
+        
+        return sheet, sheet_id
+        
+    except Exception as e:
+        st.error(f"Error connecting to Google Sheets: {str(e)}")
+        return None, None
+
+# Initialize Google Sheets
+sheet_data = init_google_sheets()
+sheet = sheet_data[0] if sheet_data else None
+current_sheet_id = sheet_data[1] if sheet_data else None
+
+# App title
+st.title("Paraguay GAA Management System")
+
+# Debug info
+with st.expander("Debug Info"):
+    st.write("Available secret keys:", list(st.secrets.keys()) if hasattr(st, 'secrets') else "No secrets")
+    st.write("Sheet connection:", "✅ Connected" if sheet else "❌ Failed")
+    st.write("Current Sheet ID:", current_sheet_id)
+
+if sheet is None:
+    st.error("Failed to connect to Google Sheets. Please check your configuration.")
+    st.info("Check the Debug Info section above for more details.")
+    st.stop()
+
+# Sidebar for navigation
+st.sidebar.title("Navigation")
+page = st.sidebar.selectbox("Choose a page", ["Dashboard", "Add Data", "View Data", "Settings"])
+
+if page == "Dashboard":
+    st.header("Dashboard")
+    
+    col1, col2, col3 = st.columns(3)
+    
+    with col1:
+        st.metric("Total Records", "0", "0")
+    
+    with col2:
+        st.metric("This Month", "0", "0")
+    
+    with col3:
+        st.metric("Last Updated", "Never")
+
+elif page == "Add Data":
+    st.header("Add New Data")
+    
+    with st.form("add_data_form"):
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            name = st.text_input("Name")
+            email = st.text_input("Email")
+            
+        with col2:
+            phone = st.text_input("Phone")
+            category = st.selectbox("Category", ["Player", "Coach", "Official", "Volunteer"])
+        
+        notes = st.text_area("Notes")
+        
+        submitted = st.form_submit_button("Add Record")
+        
+        if submitted:
+            if name and email:
+                try:
+                    # Get the first worksheet
+                    worksheet = sheet.get_worksheet(0)
+                    
+                    # Prepare data
+                    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                    row_data = [timestamp, name, email, phone, category, notes]
+                    
+                    # Add data to sheet
+                    worksheet.append_row(row_data)
+                    
+                    st.success("Record added successfully!")
+                    st.rerun()
+                    
+                except Exception as e:
+                    st.error(f"Error adding record: {str(e)}")
+            else:
+                st.error("Please fill in at least Name and Email fields.")
+
+elif page == "View Data":
+    st.header("View Data")
+    
+    try:
+        # Get the first worksheet
+        worksheet = sheet.get_worksheet(0)
+        
+        # Get all records
+        records = worksheet.get_all_records()
+        
+        if records:
+            df = pd.DataFrame(records)
+            
+            # Display data
+            st.dataframe(df, use_container_width=True)
+            
+            # Download button
+            csv = df.to_csv(index=False)
+            st.download_button(
+                label="Download CSV",
+                data=csv,
+                file_name=f"paraguay_gaa_data_{datetime.now().strftime('%Y%m%d')}.csv",
+                mime="text/csv"
+            )
+            
+        else:
+            st.info("No data available yet.")
+            
+    except Exception as e:
+        st.error(f"Error loading data: {str(e)}")
+
+elif page == "Settings":
+    st.header("Settings")
+    
+    st.subheader("Google Sheets Configuration")
+    st.write(f"**Sheet ID:** {current_sheet_id}")
+    
+    if st.button("Test Connection"):
+        if sheet:
+            try:
+                worksheet = sheet.get_worksheet(0)
+                st.success("✅ Connection successful!")
+                st.write(f"**Sheet Title:** {sheet.title}")
+                st.write(f"**Worksheet Count:** {len(sheet.worksheets())}")
+            except Exception as e:
+                st.error(f"Connection test failed: {str(e)}")
+        else:
+            st.error("❌ Connection failed!")
 st.title("O'Niels Jersey Order Form - June 2025")
 st.markdown("""
 #### 🇬🇧 English / 🇪🇸 Español
