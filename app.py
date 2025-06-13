@@ -191,8 +191,8 @@ polo_prices = {
 
 # User inputs
 name = st.text_input("Full Name / Nombres y Apellido *")
-whatsapp = st.text_input("Your WhatsApp / Tu WhatsApp *")
-number = st.number_input("Preferred Jersey Number (1-99) / Número preferido (No 1-30) *", min_value=31, max_value=99, step=1)
+whatsapp = st.number_input("Your WhatsApp / Tu WhatsApp *")
+number = st.number_input("Preferred Jersey Number (1-99) / Número preferido (No 1-30) *", min_value=1, max_value=99, step=1)
 
 jersey1 = st.selectbox("Jersey Size (1st) / Talla de camiseta (1.ª)", list(jersey_prices.keys()))
 jersey2 = st.selectbox("Jersey Size (2nd) / Talla de camiseta (2.ª)", list(jersey_prices.keys()))
