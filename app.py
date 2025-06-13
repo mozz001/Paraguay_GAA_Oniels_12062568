@@ -13,9 +13,8 @@ SCOPES = [
     "https://www.googleapis.com/auth/drive.file"    # Only access created files
 ]
 
-# Access the spreadsheet and sheet
-spreadsheet = client.open_by_key("1KSJH2VPZGNZz3gMUdc-RUGqCSgYnwvKF7cYoKLuiZi0")
-sheet = spreadsheet.worksheet("Sheet1")
+# Replace any problematic secret loading with:
+SHEET_ID = st.secrets["google_sheets"]["sheet_id"]
 
 def get_google_credentials():
     """Secure credential loading with enhanced validation"""
