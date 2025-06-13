@@ -153,7 +153,7 @@ with st.sidebar:
     if st.button("Do not click"):
         test_connection()
     
-    if st.button("Do not click"):
+    if st.button("Do not click please"):
         if setup_sheet_headers():
             st.success("✅ Headers added to sheet!")
         else:
