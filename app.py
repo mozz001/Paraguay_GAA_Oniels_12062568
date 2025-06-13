@@ -13,6 +13,10 @@ SCOPES = [
     "https://www.googleapis.com/auth/drive.file"    # Only access created files
 ]
 
+# SEPARATE CONFIG (optional)
+[google_sheets]
+sheet_id = "1KSJH2VPZGNZz3gMUdc-RUGqCSgYnwvKF7cYoKLuiZi0"
+
 def get_google_credentials():
     """Secure credential loading with enhanced validation"""
     if 'gcp_service_account' not in st.secrets:
@@ -54,6 +58,7 @@ st.markdown("""
 Please fill in all the fields below. Prices will be calculated in real time.
 Por favor complete todos los campos a continuación. Los precios se calcularán en tiempo real.
 """)
+
 
 # Google Sheets Functions
 def setup_sheet_headers():
@@ -284,18 +289,25 @@ def get_next_order_number(csv_file):
     next_id = int(last_id) + 1
     return f"{next_id:03d}"
 
-# Submission
+
+# Submission - REPLACE THIS ENTIRE SECTION
 if st.button("Submit Order / Enviar pedido"):
     if not all([name, whatsapp, confirm_name_date]):
         st.error("❌ Please complete all required fields. / Por favor complete todos los campos obligatorios.")
     else:
-        csv_file = "orders.csv"
-        order_id = get_next_order_number(csv_file)
-        order = {
+        # Get next order ID FROM GOOGLE SHEETS (using your existing function)
+        order_id = get_next_order_number()
+        
+        # Prepare order data
+        order_data = {
             "order_id": order_id,
             "name": name,
             "whatsapp": whatsapp,
             "number": number,
+            "jersey1": jersey1,
+            "jersey2": jersey2,
+            "shorts1": shorts1,
+            "shorts2": shorts2,
             "jersey1": jersey1,
             "jersey2": jersey2,
             "shorts1": shorts1,
@@ -306,9 +318,12 @@ if st.button("Submit Order / Enviar pedido"):
             "polo_kid": polo_kid,
             "total_usd": total,
             "confirmation": confirm_name_date,
-            "timestamp": datetime.now().isoformat()
+            "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S")  # Better format for Sheets
         }
-        df = pd.DataFrame([order])
-        df.to_csv(csv_file, mode='a', header=not os.path.exists(csv_file), index=False)
-        st.success(f"✅ Order #{order_id} submitted successfully!")
-        st.balloons()
+        
+        # WRITE TO GOOGLE SHEETS (using your existing function)
+        if write_to_google_sheets(order_data):
+            st.success(f"✅ Order #{order_id} submitted to Google Sheets!")
+            st.balloons()
+        else:
+            st.error("❌ Failed to save to Google Sheets. Please try again.")
