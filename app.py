@@ -46,7 +46,7 @@ def init_google_sheets():
             # Fallback to hardcoded values for testing
             st.warning("Using fallback configuration")
             sheet_id = "1KSJH2VPZGNZz3gMUdc-RUGqCSgYnwvKF7cYoKLuiZi0"
-            credentials_info = {
+            creds_dict = {
                 "type": "service_account",
                 "project_id": "paraguay-gaa-oniels-12062568",
                 "private_key_id": "cefdea10a961bac557ece512c650f505c5ed0640",
