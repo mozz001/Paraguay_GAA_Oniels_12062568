@@ -144,20 +144,20 @@ def test_connection():
         st.success(f"✅ Connected to Google Sheet: '{sheet_title}'")
         return True
     except Exception as e:
-        st.error(f"❌ Connection failed: {str(e)}")
+        st.error(f"❌ Why tf are you clicking?")
         return False
 # Sidebar for testing
 with st.sidebar:
-    st.header("🔧Admins, Please Do Not Click")
+    st.header("🔧Admins only, Please Do Not Click")
     
-    if st.button("Test Google Sheets Connection"):
+    if st.button("Do not click"):
         test_connection()
     
-    if st.button("Setup Sheet Headers"):
+    if st.button("Do not click"):
         if setup_sheet_headers():
             st.success("✅ Headers added to sheet!")
         else:
-            st.info("ℹ️ Headers already exist or connection failed")
+            st.info("ℹ️ Bro, seriously? Don't click FFS")
 
 # Price mappings
 jersey_prices = {
