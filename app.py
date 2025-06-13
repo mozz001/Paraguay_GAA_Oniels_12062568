@@ -7,6 +7,10 @@ from googleapiclient.discovery import build
 import gspread
 from google.api_core.exceptions import GoogleAPIError
 
+# Constants
+SHEET_ID = "1KSJH2VPZGNZz3gMUdc-RUGqCSgYnwvKF7cYoKLuiZi0"
+SHEET_NAME = "Sheet1"
+
 # Define the scope (more restrictive)
 SCOPES = [
     "https://www.googleapis.com/auth/spreadsheets",
@@ -96,10 +100,27 @@ def setup_sheet_headers():
         st.error(f"Error setting up headers: {str(e)}")
         return False
 
-def write_to_google_sheets(order_data):
-    """Write order data to Google Sheets"""
+def setup_sheet_headers():
+    """Setup headers using gspread only"""
     try:
-        # Convert order data to list format
+        headers = ["order_id", "name", "whatsapp", "number", "jersey1", "jersey2", 
+                 "shorts1", "shorts2", "socks1", "socks2", "polo_adult", "polo_kid",
+                 "total_usd", "confirmation", "timestamp"]
+        
+        # Get current headers
+        current_headers = worksheet.row_values(1)
+        
+        if not current_headers:
+            worksheet.insert_row(headers, 1)
+            return True
+        return False
+    except Exception as e:
+        st.error(f"Header setup error: {str(e)}")
+        return False
+
+def write_to_google_sheets(order_data):
+    """Write using gspread only"""
+    try:
         row_data = [
             order_data["order_id"],
             order_data["name"],
@@ -117,45 +138,24 @@ def write_to_google_sheets(order_data):
             order_data["confirmation"],
             order_data["timestamp"]
         ]
-        
-        # Append to sheet
-        result = service.spreadsheets().values().append(
-            spreadsheetId=SHEET_ID,
-            range="Sheet1!A:O",
-            valueInputOption="RAW",
-            insertDataOption="INSERT_ROWS",
-            body={"values": [row_data]}
-        ).execute()
-        
+        worksheet.append_row(row_data)
         return True
     except Exception as e:
-        st.error(f"Error writing to Google Sheets: {str(e)}")
+        st.error(f"Write error: {str(e)}")
         return False
 
 def get_next_order_number():
-    """Get the next order number directly from Google Sheets"""
+    """Get next ID using gspread only"""
     try:
-        # Fetch all order IDs from column A
-        result = service.spreadsheets().values().get(
-            spreadsheetId=SHEET_ID,
-            range="Sheet1!A2:A"  # Skip header row
-        ).execute()
-        
-        values = result.get('values', [])
-        
-        # If empty sheet (only headers), start with "001"
-        if not values:
+        order_ids = worksheet.col_values(1)[1:]  # Skip header
+        if not order_ids:
             return "001"
-        
-        # Extract all existing order IDs
-        order_ids = [row[0] for row in values if row and row[0].isdigit()]
-        
-        # Return next ID (max + 1) or "001" if no valid IDs found
-        return f"{max([int(id) for id in order_ids]) + 1:03d}" if order_ids else "001"
-        
+        numeric_ids = [int(id) for id in order_ids if id.isdigit()]
+        return f"{max(numeric_ids) + 1:03d}" if numeric_ids else "001"
     except Exception as e:
-        st.error(f"⚠️ Failed to get order number: {str(e)}")
-        return "001"  # Fallback value
+        st.error(f"ID error: {str(e)}")
+        return "001"
+
 
 # Test Google Sheets connection
 def test_connection():
@@ -295,25 +295,21 @@ if st.button("Submit Order / Enviar pedido"):
         
         # Prepare order data
         order_data = {
-            "order_id": order_id,
-            "name": name,
-            "whatsapp": whatsapp,
-            "number": number,
-            "jersey1": jersey1,
-            "jersey2": jersey2,
-            "shorts1": shorts1,
-            "shorts2": shorts2,
-            "jersey1": jersey1,
-            "jersey2": jersey2,
-            "shorts1": shorts1,
-            "shorts2": shorts2,
-            "socks1": socks1,
-            "socks2": socks2,
-            "polo_adult": polo_adult,
-            "polo_kid": polo_kid,
-            "total_usd": total,
-            "confirmation": confirm_name_date,
-            "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S")  # Better format for Sheets
+        "order_id": order_id,
+        "name": name,
+        "whatsapp": whatsapp,
+        "number": number,
+        "jersey1": jersey1,
+        "jersey2": jersey2,
+        "shorts1": shorts1,
+        "shorts2": shorts2,
+        "socks1": socks1,
+        "socks2": socks2,
+        "polo_adult": polo_adult,
+        "polo_kid": polo_kid,
+        "total_usd": total,
+        "confirmation": confirm_name_date,
+        "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         }
         
         # WRITE TO GOOGLE SHEETS (using your existing function)
