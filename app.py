@@ -6,6 +6,7 @@ from google.oauth2 import service_account
 from googleapiclient.discovery import build
 import gspread
 from google.api_core.exceptions import GoogleAPIError
+import re
 
 # Constants
 SHEET_ID = "1KSJH2VPZGNZz3gMUdc-RUGqCSgYnwvKF7cYoKLuiZi0"
@@ -191,7 +192,10 @@ polo_prices = {
 
 # User inputs
 name = st.text_input("Full Name / Nombres y Apellido *")
-whatsapp = st.number_input("Your WhatsApp / Tu WhatsApp *")
+#whatsapp = st.number_input("Your WhatsApp / Tu WhatsApp *")
+whatsapp = st.text_input("Your WhatsApp / Tu WhatsApp *")
+if whatsapp and not re.match(r'^\+?[0-9\s\-]{10,15}$', whatsapp):
+    st.error("Please enter a valid phone number (e.g. +595991234567)")
 number = st.number_input("Preferred Jersey Number (1-99) / Número preferido (No 1-99) *", min_value=1, max_value=99, step=1)
 
 jersey1 = st.selectbox("Jersey Size (1st) / Talla de camiseta (1.ª)", list(jersey_prices.keys()))
