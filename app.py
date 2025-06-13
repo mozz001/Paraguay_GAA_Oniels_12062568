@@ -37,7 +37,7 @@ try:
     
     # Initialize clients with error handling
     gspread_client = gspread.authorize(creds)
-    sheets_service = build('sheets', 'v4', credentials=creds)
+    service = build('sheets', 'v4', credentials=creds)
     
     # Access spreadsheet with explicit error handling
     SPREADSHEET_ID = "1KSJH2VPZGNZz3gMUdc-RUGqCSgYnwvKF7cYoKLuiZi0"
