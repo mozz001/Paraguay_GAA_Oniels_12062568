@@ -148,7 +148,7 @@ def test_connection():
         return False
 # Sidebar for testing
 with st.sidebar:
-    st.header("🔧 Setup & Testing")
+    st.header("🔧Admins, Please Do Not Click")
     
     if st.button("Test Google Sheets Connection"):
         test_connection()
