@@ -128,30 +128,29 @@ def write_to_google_sheets(order_data):
         return False
 
 def get_next_order_number():
-    """Get next order number from Google Sheets"""
+    """Get the next order number directly from Google Sheets"""
     try:
-        # Get all order IDs from Google Sheets
+        # Fetch all order IDs from column A
         result = service.spreadsheets().values().get(
             spreadsheetId=SHEET_ID,
-            range="Sheet1!A:A"
+            range="Sheet1!A2:A"  # Skip header row
         ).execute()
         
         values = result.get('values', [])
         
-        if len(values) <= 1:  # Only headers or empty
+        # If empty sheet (only headers), start with "001"
+        if not values:
             return "001"
         
-        # Get the last order ID and increment
-        order_ids = [row[0] for row in values[1:] if row]  # Skip header
-        if order_ids:
-            last_id = max([int(id_str) for id_str in order_ids if id_str.isdigit()])
-            return f"{last_id + 1:03d}"
-        else:
-            return "001"
-            
+        # Extract all existing order IDs
+        order_ids = [row[0] for row in values if row and row[0].isdigit()]
+        
+        # Return next ID (max + 1) or "001" if no valid IDs found
+        return f"{max([int(id) for id in order_ids]) + 1:03d}" if order_ids else "001"
+        
     except Exception as e:
-        st.error(f"Error getting order number: {str(e)}")
-        return "001"
+        st.error(f"⚠️ Failed to get order number: {str(e)}")
+        return "001"  # Fallback value
 
 # Test Google Sheets connection
 def test_connection():
