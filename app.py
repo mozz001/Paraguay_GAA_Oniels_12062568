@@ -149,18 +149,7 @@ def test_connection():
     except Exception as e:
         st.error(f"❌ Why tf are you clicking?")
         return False
-# Sidebar for testing
-with st.sidebar:
-    st.header(f"### 💵 Total: **${total:.2f}** USD")
-    
-    if st.button("🔧Admins only, Please Do Not Click"):
-        test_connection()
-    
-    if st.button("🔧Admins only, Please Do Not Click"):
-        if setup_sheet_headers():
-            st.success("✅ Headers added to sheet!")
-        else:
-            st.info("ℹ️ Bro, seriously? Don't click FFS")
+
 
 # Price mappings
 
@@ -335,3 +324,16 @@ if st.button("Submit Order / Enviar pedido"):
             st.balloons()
         else:
             st.error("❌ Failed to save. Please try again or contact support.")
+
+# Sidebar
+with st.sidebar:
+    st.header(f"### 💵 Total: **${total:.2f}** USD")
+    
+    if st.button("🔧Admins only, Please Do Not Click"):
+        test_connection()
+    
+    if st.button("🔧Admins only, Please Do Not Click"):
+        if setup_sheet_headers():
+            st.success("✅ Headers added to sheet!")
+        else:
+            st.info("ℹ️ Bro, seriously? Don't click FFS")
