@@ -211,6 +211,7 @@ polo_prices = {
 # User inputs
 name = st.text_input("Full Name / Nombres y Apellido *")
 #whatsapp = st.number_input("Your WhatsApp / Tu WhatsApp *")
+name_on_the_jersey = st.text_input(Nombre en la camiseta *")
 whatsapp = st.text_input("Your WhatsApp / Tu WhatsApp *")
 if whatsapp and not re.match(r'^\+?[0-9\s\-]{10,15}$', whatsapp):
     st.error("Please enter a valid phone number (e.g. +595991234567) Ingrese un número de teléfono válido (por ejemplo, +595991234567) ")
