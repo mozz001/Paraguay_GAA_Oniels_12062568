@@ -287,7 +287,7 @@ total = jersey_prices[jersey1] + jersey_prices[jersey2] + \
         (jersey_name_price if jersey1_name else 0) + \
         (jersey_name_price if jersey2_name else 0) + \
         shorts_prices[shorts1] + shorts_prices[shorts2] + \
-        socks_prices[socks1] + socks_prices[socks2] + \
+        socks_prices[socks1] + socks_prices[socks2] + \  # Make sure this matches your variable name
         polo_prices[polo_adult] + polo_prices[polo_kid]
 
 st.markdown(f"### 💵 Total: **${total:.2f}** USD")
@@ -301,24 +301,24 @@ if st.button("Submit Order / Enviar pedido"):
     else:
         order_id = get_next_order_number()
         order_data = {
-        "order_id": order_id,
-        "name": name,
-        "whatsapp": whatsapp,
-        "number": number,
-        "jersey1": jersey1,
-        "jersey1_name": jersey1_name if jersey1_name else "None",
-        "jersey2": jersey2,
-        "jersey2_name": jersey2_name if jersey2_name else "None",
-        "shorts1": shorts1,
-        "shorts2": shorts2,
-        "socks1": socks1,
-        "socks2": socks2,
-        "polo_adult": polo_adult,
-        "polo_kid": polo_kid,
-        "total_usd": total,
-        "confirmation": confirm_name_date,
-        "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-}
+            "order_id": order_id,
+            "name": name,
+            "whatsapp": whatsapp,
+            "number": number,
+            "jersey1": jersey1,
+            "jersey1_name": jersey1_name if jersey1_name else "None",
+            "jersey2": jersey2,
+            "jersey2_name": jersey2_name if jersey2_name else "None",
+            "shorts1": shorts1,
+            "shorts2": shorts2,
+            "socks1": socks1,
+            "socks2": socks2,
+            "polo_adult": polo_adult,
+            "polo_kid": polo_kid,
+            "total_usd": total,
+            "confirmation": confirm_name_date,
+            "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        }
         
         if write_to_google_sheets(order_data):
             st.success(f"✅ Order #{order_id} saved successfully!")
