@@ -318,7 +318,7 @@ if st.button("Submit Order / Enviar pedido"):
         "total_usd": total,
         "confirmation": confirm_name_date,
         "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-       }
+}
         
         if write_to_google_sheets(order_data):
             st.success(f"✅ Order #{order_id} saved successfully!")
