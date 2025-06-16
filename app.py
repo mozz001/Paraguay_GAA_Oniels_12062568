@@ -254,9 +254,9 @@ Entiendo que no pagar el 70% restante del costo total puede resultar en la cance
 Reconozco que el Paraguay GAA no es responsable de la fabricación ni del control de calidad de la equipación. Cualquier problema, reclamo o garantía debe tratarse directamente con O’Neills, el proveedor.
 
 6. I acknowledge that the products are from O’Neills and agree to abide by their Terms & Conditions, available at:
-[Insert O’Neills Terms & Conditions link]
-Reconozco que los productos son de O’Neills y acepto cumplir con sus Términos y Condiciones, disponibles en:
-[ Terms & Conditions  ]
+[https://www.oneills.com/us_en/terms-conditions]
+Reconozco que los productos son de O’Neills y acepto cumplir con sus Términos y Condiciones, disponibles en (Solomente Ingles):
+[https://www.oneills.com/us_en/terms-conditions]
 
 7. I understand that delivery to Paraguay may take time, and the club is committed to providing regular updates, at least weekly, until the kits arrive.
 Entiendo que la entrega a Paraguay puede tardar, y el club se compromete a proporcionar actualizaciones regulares, al menos una vez por semana, hasta que llegue la equipación.
