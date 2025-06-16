@@ -151,7 +151,7 @@ def test_connection():
         return False
 # Sidebar for testing
 with st.sidebar:
-    st.header("f"### 💵 Total: **${total:.2f}** USD")
+    st.header(f"### 💵 Total: **${total:.2f}** USD")
     
     if st.button("🔧Admins only, Please Do Not Click"):
         test_connection()
