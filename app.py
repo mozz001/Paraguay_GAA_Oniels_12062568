@@ -151,12 +151,12 @@ def test_connection():
         return False
 # Sidebar for testing
 with st.sidebar:
-    st.header("🔧Admins only, Please Do Not Click")
+    st.header("f"### 💵 Total: **${total:.2f}** USD")
     
-    if st.button("Do not click"):
+    if st.button("🔧Admins only, Please Do Not Click"):
         test_connection()
     
-    if st.button("Do not click please"):
+    if st.button("🔧Admins only, Please Do Not Click"):
         if setup_sheet_headers():
             st.success("✅ Headers added to sheet!")
         else:
