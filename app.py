@@ -300,7 +300,7 @@ if st.button("Submit Order / Enviar pedido"):
         st.error("❌ Please complete all required fields.")
     else:
         order_id = get_next_order_number()
-       order_data = {
+        order_data = {
         "order_id": order_id,
         "name": name,
         "whatsapp": whatsapp,
