@@ -212,6 +212,14 @@ polo_prices = {
 
 jersey_name_price = 10.00  # USD cost for adding a name to a jersey
 
+# PDF file URL or path (if hosted online)
+pdf_url = "https://drive.google.com/file/d/14Ee1E6g1nGG2Gl1YCYss8XYqacFBJipj/view?usp=sharing"  # Replace with your actual PDF URL
+
+# Use Markdown to make the caption a clickable link
+st.markdown(
+    f"[Open here to view the photos - Haga clic aquí para ver las fotos]({pdf_url})",
+    unsafe_allow_html=True
+)
 # User inputs
 name = st.text_input("Full Name / Nombres y Apellido *")
 #whatsapp = st.number_input("Your WhatsApp / Tu WhatsApp *")
