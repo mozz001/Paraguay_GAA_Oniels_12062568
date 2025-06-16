@@ -289,7 +289,7 @@ total = jersey_prices[jersey1] + jersey_prices[jersey2] + \
         (jersey_name_price if jersey1_name else 0) + \
         (jersey_name_price if jersey2_name else 0) + \
         shorts_prices[shorts1] + shorts_prices[shorts2] + \
-        socks_prices[socks1] + socks_prices[socks2] + \  # Make sure this matches your variable name
+        socks_prices[socks1] + socks_prices[socks2] + \ 
         polo_prices[polo_adult] + polo_prices[polo_kid]
 
 st.markdown(f"### 💵 Total: **${total:.2f}** USD")
