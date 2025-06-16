@@ -212,6 +212,10 @@ polo_prices = {
 
 jersey_name_price = 10.00  # USD cost for adding a name to a jersey
 
+
+# User inputs
+name = st.text_input("Full Name / Nombres y Apellido *")
+#whatsapp = st.number_input("Your WhatsApp / Tu WhatsApp *")
 # PDF file URL or path (if hosted online)
 pdf_url = "https://drive.google.com/file/d/14Ee1E6g1nGG2Gl1YCYss8XYqacFBJipj/view?usp=sharing"  # Replace with your actual PDF URL
 
@@ -220,10 +224,6 @@ st.markdown(
     f"[Open here to view the photos - Haga clic aquí para ver las fotos]({pdf_url})",
     unsafe_allow_html=True
 )
-# User inputs
-name = st.text_input("Full Name / Nombres y Apellido *")
-#whatsapp = st.number_input("Your WhatsApp / Tu WhatsApp *")
-
 whatsapp = st.text_input("Your WhatsApp / Tu WhatsApp *")
 if whatsapp and not re.match(r'^\+?[0-9\s\-]{10,15}$', whatsapp):
     st.error("Please enter a valid phone number (e.g. +595991234567) Ingrese un número de teléfono válido (por ejemplo, +595991234567) ")
