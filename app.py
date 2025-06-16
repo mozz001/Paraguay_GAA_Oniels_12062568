@@ -208,17 +208,23 @@ polo_prices = {
     "No quiero esto, I don't need this": 0.0
 }
 
+jersey_name_price = 10.00  # USD cost for adding a name to a jersey
+
 # User inputs
 name = st.text_input("Full Name / Nombres y Apellido *")
 #whatsapp = st.number_input("Your WhatsApp / Tu WhatsApp *")
-name_on_the_jersey = st.text_input(Nombre en la camiseta *")
+
 whatsapp = st.text_input("Your WhatsApp / Tu WhatsApp *")
 if whatsapp and not re.match(r'^\+?[0-9\s\-]{10,15}$', whatsapp):
     st.error("Please enter a valid phone number (e.g. +595991234567) Ingrese un número de teléfono válido (por ejemplo, +595991234567) ")
 number = st.number_input("Preferred Jersey Number (1-99) / Número preferido (No 1-99) *", min_value=1, max_value=99, step=1)
 
+st.caption(f"Adding a name costs an additional ${jersey_name_price:.2f} USD per jersey / Agregar un nombre cuesta ${jersey_name_price:.2f} USD adicionales por camiseta")
+
 jersey1 = st.selectbox("Jersey Size (1st) / Talla de camiseta (1.ª)", list(jersey_prices.keys()))
+jersey1_name = st.text_input("Name for 1st Jersey (Leave blank if none) / Nombre para 1.ª camiseta (Dejar vacío si no desea)")
 jersey2 = st.selectbox("Jersey Size (2nd) / Talla de camiseta (2.ª)", list(jersey_prices.keys()))
+jersey2_name = st.text_input("Name for 2nd Jersey (Leave blank if none) / Nombre para 2.ª camiseta (Dejar vacío si no desea)")
 
 shorts1 = st.selectbox("Shorts (1st) / Pantalones (1.º)", list(shorts_prices.keys()))
 shorts2 = st.selectbox("Shorts (2nd) / Pantalones (2.º)", list(shorts_prices.keys()))
@@ -278,9 +284,11 @@ confirm_name_date = st.text_input("Confirm your full name and today's date / Con
 
 # Total Calculation
 total = jersey_prices[jersey1] + jersey_prices[jersey2] + \
-         shorts_prices[shorts1] + shorts_prices[shorts2] + \
-         socks_prices[socks1] + socks_prices[socks2] + \
-         polo_prices[polo_adult] + polo_prices[polo_kid]
+        (jersey_name_price if jersey1_name else 0) + \
+        (jersey_name_price if jersey2_name else 0) + \
+        shorts_prices[shorts1] + shorts_prices[shorts2] + \
+        socks_prices[socks1] + socks_prices[socks2] + \
+        polo_prices[polo_adult] + polo_prices[polo_kid]
 
 st.markdown(f"### 💵 Total: **${total:.2f}** USD")
 
@@ -292,23 +300,25 @@ if st.button("Submit Order / Enviar pedido"):
         st.error("❌ Please complete all required fields.")
     else:
         order_id = get_next_order_number()
-        order_data = {
-            "order_id": order_id,
-            "name": name,
-            "whatsapp": whatsapp,
-            "number": number,
-            "jersey1": jersey1,
-            "jersey2": jersey2,
-            "shorts1": shorts1,
-            "shorts2": shorts2,
-            "socks1": socks1,
-            "socks2": socks2,
-            "polo_adult": polo_adult,
-            "polo_kid": polo_kid,
-            "total_usd": total,
-            "confirmation": confirm_name_date,
-            "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        }
+       order_data = {
+        "order_id": order_id,
+        "name": name,
+        "whatsapp": whatsapp,
+        "number": number,
+        "jersey1": jersey1,
+        "jersey1_name": jersey1_name if jersey1_name else "None",
+        "jersey2": jersey2,
+        "jersey2_name": jersey2_name if jersey2_name else "None",
+        "shorts1": shorts1,
+        "shorts2": shorts2,
+        "socks1": socks1,
+        "socks2": socks2,
+        "polo_adult": polo_adult,
+        "polo_kid": polo_kid,
+        "total_usd": total,
+        "confirmation": confirm_name_date,
+        "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+       }
         
         if write_to_google_sheets(order_data):
             st.success(f"✅ Order #{order_id} saved successfully!")
