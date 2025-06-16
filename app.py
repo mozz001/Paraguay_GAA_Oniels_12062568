@@ -327,11 +327,8 @@ if st.button("Submit Order / Enviar pedido"):
 
 # Sidebar
 with st.sidebar:
-    st.header(f"### 💵 Total: **${total:.2f}** USD")
-    
-    if st.button("🔧Admins only, Please Do Not Click"):
-        test_connection()
-    
+    st.header(f"Total: **${total:.2f}** USD")
+
     if st.button("🔧Admins only, Please Do Not Click"):
         if setup_sheet_headers():
             st.success("✅ Headers added to sheet!")
