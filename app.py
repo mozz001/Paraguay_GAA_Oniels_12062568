@@ -231,7 +231,7 @@ shorts2 = st.selectbox("Shorts (2nd) / Pantalones (2.º)", list(shorts_prices.ke
 socks1 = st.selectbox("Socks (1st pair) / Medias (1.º par)", list(socks_prices.keys()))
 socks2 = st.selectbox("Socks (2nd pair) / Medias (2.º par)", list(socks_prices.keys()))
 
-polo_adult = st.radio("Polo Adult Free Size", list(polo_prices.keys()))
+polo_adult = st.radio("Polo Adult S, M, L, XL, 2XL, 3XL - add your prefered size in the signature box / añade tu tamaños preferida en el boton de la firma", list(polo_prices.keys()))
 polo_kid = st.radio("Polo Kid Free Size", list(polo_prices.keys()))
 
 # Agreement text
